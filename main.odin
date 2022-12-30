@@ -98,39 +98,39 @@ Sounds :: struct {
 // Message board system
 Message :: struct {
     l1: string,
-	l2: string,
-	duration: int,
-	frames: int,
-	displayed: bool,
-	alpha: u8,
-	gameMode: GameMode
+    l2: string,
+    duration: int,
+    frames: int,
+    displayed: bool,
+    alpha: u8,
+    gameMode: GameMode,
 }
 
 Scripts :: struct {
-    msgs: [NUM_GAME_MODE][dynamic]Message
+    msgs: [NUM_GAME_MODE][dynamic]Message,
 }
 
 // TITLE GameMode states
 TitleState :: struct {
     destForOpening: [3]Vec2,
     titleFrame: int,
-	animToDrop: int,
-	titleDropFrame: int,
-	firstCompressFrame: int,
-	lastAnimDropFrame: int,
-	titlePressFrame: int,
-	lastAnimJumpFrame: int,
-	secondCompressFrame: int,
-	fallOutFrame: int,
-	titleMessageShown: bool,
-	sceneEnd: bool,
+    animToDrop: int,
+    titleDropFrame: int,
+    firstCompressFrame: int,
+    lastAnimDropFrame: int,
+    titlePressFrame: int,
+    lastAnimJumpFrame: int,
+    secondCompressFrame: int,
+    fallOutFrame: int,
+    titleMessageShown: bool,
+    sceneEnd: bool,
 }
 
 // GamePlay GameMode states
 GamePlayState :: struct {
     resquableIndex: [NUM_COL]int,
     resquedChanged: bool,
-	firstMoveMade: bool,  
+    firstMoveMade: bool,  
     bigJumpMade:  bool, 
     lastMsgShown: bool,
     numAnimalLeft: u8,
@@ -142,11 +142,11 @@ GamePlayState :: struct {
 // accel, veloc and press in pixels/frame.
 TitleLogo :: struct {
     using pos: Vec2,
-	dest: Vec2,
-	accel: Vec2,
-	veloc: Vec2,
-	height: f32,
-	press: f32,
+    dest: Vec2,
+    accel: Vec2,
+    veloc: Vec2,
+    height: f32,
+    press: f32,
 }
 
 /*
@@ -157,18 +157,18 @@ Animal.type: High 4 bits - a bit fields of "color" ordered as blue-green-red-yel
 */
 Animal :: struct {
     using pos: Vec2,
-	dest: Vec2,
-	accel: Vec2,
-	veloc: Vec2,
-	scale: f32,
-	height: f32,
-	press: f32,
-	scaleDecRate: f32,
-	dustDuration: u8,
-	totalJumpFrames: u8,
-	ascFrames: u8,
-	currJumpFrame: u8,
-	type: u8
+    dest: Vec2,
+    accel: Vec2,
+    veloc: Vec2,
+    scale: f32,
+    height: f32,
+    press: f32,
+    scaleDecRate: f32,
+    dustDuration: u8,
+    totalJumpFrames: u8,
+    ascFrames: u8,
+    currJumpFrame: u8,
+    type: u8,
 }
 
 // Global Variables
