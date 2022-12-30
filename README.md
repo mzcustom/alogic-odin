@@ -5,7 +5,7 @@
 <img width="270" alt="alogic3" src="https://user-images.githubusercontent.com/10954412/209269811-014b7e85-b112-4eba-9f88-49cc6bd23d49.png">
 </p>
 
-Animal Logic board game implemented in Odin programming language(http://odin-lang.org/) with Raylib
+Animal Logic board game implemented in [Odin programming language](http://odin-lang.org) with Raylib
 
 # Run
 Executables are included. Clone this repo and inside the alogic-odin folder(directory),
