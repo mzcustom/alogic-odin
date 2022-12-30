@@ -65,10 +65,10 @@ Vec2LenSq :: proc(v: Vec2) -> f32 { return v.x*v.x + v.y*v.y }
 
 // GameMode Enums
 GameMode :: enum {
-	TITLE, 
-	OPENING,
-	GAME_PLAY,
-	GAME_CLEAR,
+    TITLE, 
+    OPENING,
+    GAME_PLAY,
+    GAME_CLEAR,
     GAME_OVER,
 }
 
