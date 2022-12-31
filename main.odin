@@ -180,17 +180,17 @@ scripts: Scripts
 
 // For DEBUG
 printbd :: proc(board: ^[BOARD_SIZE]^Animal) {
-	for row := 0; row < NUM_ROW; row += 1 {
-		for col := 0; col < NUM_COL; col += 1 {
-			anim := board[row*NUM_COL + col]
-			if anim == nil { 
-				fmt.printf("00000000 ") 
-			} else { 
-				fmt.printf("%08b ", anim.type)
-			}
-		}
-		fmt.printf("\n")
-	}
+    for row := 0; row < NUM_ROW; row += 1 {
+        for col := 0; col < NUM_COL; col += 1 {
+            anim := board[row*NUM_COL + col]
+            if anim == nil { 
+                fmt.printf("00000000 ") 
+            } else { 
+                fmt.printf("%08b ", anim.type)
+            }
+        }
+        fmt.printf("\n")
+    }
 }
 
 findFirst1Bit :: proc(target : u8) -> (order : int) {
@@ -259,20 +259,20 @@ drawTitle :: proc(title: ^TitleLogo) {
 }
 
 setAnimals :: proc(animals: ^[BOARD_SIZE]Animal) {
-	color, kind := u8(1), u8(1)
+    color, kind := u8(1), u8(1)
 
-	for row := 0; row < NUM_ROW; row += 1 {
-		colorBit := color << NUM_KIND
-		for col := 0; col < NUM_COL; col += 1 {
-			boardIndex := row * NUM_COL + col
-			animals[boardIndex].height = ANIM_SIZE 
-			animals[boardIndex].type = colorBit | kind
-			animals[boardIndex].scale = 1
-			kind <<= 1
-		}
-		kind = 1
-		color <<= 1
-	}
+    for row := 0; row < NUM_ROW; row += 1 {
+        colorBit := color << NUM_KIND
+        for col := 0; col < NUM_COL; col += 1 {
+            boardIndex := row * NUM_COL + col
+            animals[boardIndex].height = ANIM_SIZE 
+            animals[boardIndex].type = colorBit | kind
+            animals[boardIndex].scale = 1
+            kind <<= 1
+        }
+        kind = 1
+        color <<= 1
+    }
 }
 
 /*
@@ -423,19 +423,19 @@ drawAnimal :: proc(anim: ^Animal) {
 }
 
 isAnimRectClicked :: proc(anim: ^Animal) -> bool {
-	if anim == nil { return false }
+    if anim == nil { return false }
 
-	mouseX := f32(rl.GetMouseX())
-	mouseY := f32(rl.GetMouseY())
-	halfLength := ANIM_SIZE/2
+    mouseX := f32(rl.GetMouseX())
+    mouseY := f32(rl.GetMouseY())
+    halfLength := ANIM_SIZE/2
 
-	when ODIN_DEBUG {
-	    fmt.printf("Mouse Clicked at : %d, %d\n", mouseX, mouseY)
-	    fmt.printf("AnimPos : %d, %d\n", anim.x, anim.y)
-	}
+    when ODIN_DEBUG {
+        fmt.printf("Mouse Clicked at : %d, %d\n", mouseX, mouseY)
+        fmt.printf("AnimPos : %d, %d\n", anim.x, anim.y)
+    }
 
-	return mouseX >= anim.x - halfLength && mouseX <= anim.x + halfLength &&
-		   mouseY >= anim.y - halfLength && mouseY <= anim.y + halfLength   
+    return mouseX >= anim.x - halfLength && mouseX <= anim.x + halfLength &&
+           mouseY >= anim.y - halfLength && mouseY <= anim.y + halfLength   
 }
 
 loadAssets :: proc() {
@@ -563,7 +563,7 @@ updateAnimState :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SI
         }
 
         // Update Pos and Veloc if it's moving or has accel
-        if !(anim.veloc == {}) || !(anim.accel == {}) {
+        if anim.veloc != {} || anim.accel != {} {
             isAllUpdated = false
             anim.pos += anim.veloc
             anim.veloc += anim.accel
@@ -593,8 +593,8 @@ updateAnimState :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SI
                 lastResquedIndex := BOARD_SIZE - 1 - numAnimalLeft
                 if gameMode == GameMode.GAME_PLAY && lastResquedIndex > 0 && 
                    anim == resqued[lastResquedIndex] {
-                    // when a big jump is made, send previously resqued animals back to the land
-                        if anim.veloc.y > FPS && gpState.bigJumpLeft > 0 {
+                        // when a big jump is made, send previously resqued animals back to the land
+                        if anim.veloc.y > FPS && bigJumpLeft > 0 {
                         bigJumpMade = true
                         scatterResqued(board, resqued, int(lastResquedIndex - 1), frontRowPos,
                                        &numAnimalLeft, &resquedChanged)
@@ -638,10 +638,10 @@ updateAnimState :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SI
 
 resetAnimalsAndBoard :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SIZE]^Animal,
                              frontRowPos: ^[NUM_COL]Vec2) {
-	animals^, board^, resqued^ = {}, {}, {}
-	setAnimals(animals)
-	for i := 0; i < BOARD_SIZE; i += 1 { board[i] = &animals[i] }
-	shuffleBoard(board, frontRowPos)
+    animals^, board^, resqued^ = {}, {}, {}
+    setAnimals(animals)
+    for i := 0; i < BOARD_SIZE; i += 1 { board[i] = &animals[i] }
+    shuffleBoard(board, frontRowPos)
 }
 
 resetGamePlayState :: proc(board: ^[BOARD_SIZE]^Animal, gpState: ^GamePlayState) {
@@ -1059,11 +1059,11 @@ main :: proc() {
 
                 fontColor.a = u8(msg.alpha)
                 l1PosX := i32((1 - (f32(len(msg.l1))/MAX_MSG_LEN))*WINDOW_WIDTH/2)
-                l2PosX := i32((1 - (f32(len(msg.l2))/MAX_MSG_LEN))*WINDOW_WIDTH/2)
                 if msg.l2 == "" {
                     rl.DrawText(cstring(raw_data(msg.l1)), MARGIN_WIDTH + l1PosX, MSG_POS_Y,
                                 DEFAULT_FONT_SIZE, fontColor)
                 } else {
+                    l2PosX := i32((1 - (f32(len(msg.l2))/MAX_MSG_LEN))*WINDOW_WIDTH/2)
                     rl.DrawText(cstring(raw_data(msg.l1)), MARGIN_WIDTH + l1PosX, 
                                 MSG_POS_Y - DEFAULT_FONT_SIZE*0.5, DEFAULT_FONT_SIZE, fontColor)
                     rl.DrawText(cstring(raw_data(msg.l2)), MARGIN_WIDTH + l2PosX, 
