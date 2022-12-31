@@ -15,7 +15,7 @@ WINDOW_HEIGHT       :: 800
 UPPER_LAND_HEIGHT   :: WINDOW_WIDTH
 MARGIN_HEIGHT       :: WINDOW_HEIGHT/40
 MARGIN_WIDTH        :: MARGIN_HEIGHT
-TITLE_WIDTH		    :: WINDOW_WIDTH*0.75
+TITLE_WIDTH         :: WINDOW_WIDTH*0.75
 TITLE_HEIGHT	    :: WINDOW_HEIGHT*0.2
 MIN_TITLE_HEIGHT    :: TITLE_HEIGHT*0.5
 TITLE_LANDING_Y     :: MARGIN_HEIGHT + ROW_HEIGHT
@@ -81,18 +81,18 @@ Textures :: struct {
 }
 
 Sounds :: struct {
-	JumpSound: rl.Sound,
-	BigJumpSound: rl.Sound,
-	TitleJump: rl.Sound,
-	TitleLand: rl.Sound,
-	Start: rl.Sound,
-	Jump: rl.Sound,
-	BigJump: rl.Sound,
-	Land: rl.Sound,
-	BigLand: rl.Sound,
-	Success: rl.Sound,
-	Fail: rl.Sound,
-	Yay: rl.Sound,
+    JumpSound: rl.Sound,
+    BigJumpSound: rl.Sound,
+    TitleJump: rl.Sound,
+    TitleLand: rl.Sound,
+    Start: rl.Sound,
+    Jump: rl.Sound,
+    BigJump: rl.Sound,
+    Land: rl.Sound,
+    BigLand: rl.Sound,
+    Success: rl.Sound,
+    Fail: rl.Sound,
+    Yay: rl.Sound,
 }
 
 // Message board system
@@ -244,8 +244,8 @@ updateTitle :: proc(title: ^TitleLogo) {
 			if title.veloc.y >= 2 {
 		        title.veloc.y *= -0.5 
 			} else {
-				title.press = 0
-				title.veloc, title.accel = {}, {}
+			    title.press = 0
+			    title.veloc, title.accel = {}, {}
 			}
 		}
 	}
@@ -253,9 +253,9 @@ updateTitle :: proc(title: ^TitleLogo) {
 
 drawTitle :: proc(title: ^TitleLogo) {
     srcRect := rl.Rectangle{0, 0, TITLE_WIDTH , TITLE_HEIGHT}
-	desPos := Vec2{title.pos.x, title.pos.y + TITLE_HEIGHT - title.height}
-	desRect := rl.Rectangle{desPos.x, desPos.y, TITLE_WIDTH, title.height}
-	rl.DrawTexturePro(textures.TitleTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
+    desPos := Vec2{title.pos.x, title.pos.y + TITLE_HEIGHT - title.height}
+    desRect := rl.Rectangle{desPos.x, desPos.y, TITLE_WIDTH, title.height}
+    rl.DrawTexturePro(textures.TitleTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
 }
 
 setAnimals :: proc(animals: ^[BOARD_SIZE]Animal) {
@@ -285,7 +285,7 @@ shuffleBoard :: proc(board: ^[BOARD_SIZE]^Animal, frontRowPos: ^[NUM_COL]Vec2) {
         indexToSwap := i + 1 + int(math.floor_f32(rand.float32() * f32(BOARD_SIZE - i - 1)))
         board[i], board[indexToSwap] = board[indexToSwap], board[i]
     }
-	board[0], board[BOARD_SIZE - 1] = board[BOARD_SIZE - 1], board[0]
+    board[0], board[BOARD_SIZE - 1] = board[BOARD_SIZE - 1], board[0]
 
     for row := 0; row < NUM_COL; row += 1 {
         posY := f32(MARGIN_HEIGHT + (row*ROW_HEIGHT) + (ROW_HEIGHT/2))
@@ -293,13 +293,13 @@ shuffleBoard :: proc(board: ^[BOARD_SIZE]^Animal, frontRowPos: ^[NUM_COL]Vec2) {
             boardIndex := row*NUM_COL + col
             posX := f32(MARGIN_WIDTH + (col*COL_WIDTH) + (COL_WIDTH/2))
             board[boardIndex].dest = {posX, posY}
-			board[boardIndex].pos = {posX, posY - f32(4*ROW_HEIGHT)}
+            board[boardIndex].pos = {posX, posY - f32(4*ROW_HEIGHT)}
         }
     }
-	for i := 0; i < NUM_COL; i += 1 {
-		frontRowIndex := i + BOARD_SIZE - NUM_COL
-		frontRowPos[i] = board[frontRowIndex].dest
-	}
+    for i := 0; i < NUM_COL; i += 1 {
+        frontRowIndex := BOARD_SIZE - NUM_COL + i
+        frontRowPos[i] = board[frontRowIndex].dest
+    }
 }
 
 
@@ -326,26 +326,26 @@ findResquables :: proc(board: ^[BOARD_SIZE]^Animal, mostRecentRescuedType: u8,
 // TotalFrames CANNOT be exactly 2*ascFrames otherwise divided by 0 occurs
 jumpAnimal :: proc(anim: ^Animal, dest: Vec2, totalFrames, ascFrames: f32) {
 
-	// desFrames: frames left at the its original position while desending to dest
-	desFrames := totalFrames - ascFrames
+    // desFrames: frames left at the its original position while desending to dest
+    desFrames := totalFrames - ascFrames
 	
-	//veloc = -accel * ascFrames (accel is positive)
-	//leastAlt = anim.pos.Y + 0.5*ascFrames*veloc (veloc is negative)
-	//dest.Y = leastAlt + 0.5*accel*(desFrame)^2
-	diff: f32
-	if anim.y == dest.y {
-		diff = -ANIM_SIZE
-	} else {
-		diff = dest.y - anim.y
-	}
-	anim.accel = {0, 2*diff/(desFrames*desFrames - ascFrames*ascFrames) }
-	anim.veloc = {(dest.x - anim.x)/totalFrames, -anim.accel.y*ascFrames}
-	anim.dest = dest
-	anim.totalJumpFrames = u8(totalFrames)
-	anim.ascFrames = u8(ascFrames)
-	anim.currJumpFrame = 0
+    //veloc = -accel * ascFrames (accel is positive)
+    //leastAlt = anim.pos.Y + 0.5*ascFrames*veloc (veloc is negative)
+    //dest.Y = leastAlt + 0.5*accel*(desFrame)^2
+    diff: f32
+    if anim.y == dest.y {
+        diff = -ANIM_SIZE
+    } else {
+        diff = dest.y - anim.y
+    }
+    anim.accel = {0, 2*diff/(desFrames*desFrames - ascFrames*ascFrames) }
+    anim.veloc = {(dest.x - anim.x)/totalFrames, -anim.accel.y*ascFrames}
+    anim.dest = dest
+    anim.totalJumpFrames = u8(totalFrames)
+    anim.ascFrames = u8(ascFrames)
+    anim.currJumpFrame = 0
 	
-	if anim.height < ANIM_SIZE { anim.press = -anim.height*0.1}
+    if anim.height < ANIM_SIZE { anim.press = -anim.height*0.1}
     
     if anim.dest.x == RESQUE_SPOT_X && anim.dest.y == RESQUE_SPOT_Y {
         if gameMode == GameMode.GAME_PLAY && anim.height <= MIN_JUMP_HEIGHT { 
@@ -376,7 +376,7 @@ resqueAt :: proc(board, resqued: ^[BOARD_SIZE]^Animal, resqueIndex, numAnimalLef
             board[i] = board[i - NUM_COL]
             anim := board[i]
             jumpAnimal(anim, Vec2{anim.x, anim.y + ROW_HEIGHT}, FPS/3, FPS/10)
-		}
+        }
         i -= NUM_COL
     }
 }
