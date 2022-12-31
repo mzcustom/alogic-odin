@@ -77,7 +77,7 @@ Textures :: struct {
     TitleTexture: rl.Texture2D,
     GroundTexture: rl.Texture2D,
     AnimalsTexture: rl.Texture2D,
-    DustTexture: rl.Texture2D
+    DustTexture: rl.Texture2D,
 }
 
 Sounds :: struct {
@@ -203,52 +203,52 @@ findFirst1Bit :: proc(target : u8) -> (order : int) {
 }
 
 setTitleLogo :: proc(title: ^TitleLogo) {
-	title.x = (WINDOW_WIDTH - TITLE_WIDTH)*0.5
-	title.y = -TITLE_HEIGHT
-	title.height = TITLE_HEIGHT
-	title.dest = Vec2{title.x, TITLE_LANDING_Y} 
+    title.x = (WINDOW_WIDTH - TITLE_WIDTH)*0.5
+    title.y = -TITLE_HEIGHT
+    title.height = TITLE_HEIGHT
+    title.dest = Vec2{title.x, TITLE_LANDING_Y} 
 }
 
 updateTitle :: proc(title: ^TitleLogo) {
-	if title.press > 0 {
-		title.height -= title.press 	
-		if title.height < MIN_TITLE_HEIGHT {
-			title.height = MIN_TITLE_HEIGHT
-			title.press = -1
-		} else {
-			title.press /= 1.75
-			if title.press < 0.0001 {
-				title.press = -1
-			}
-		}
-	}
-	if title.press < 0 {
-		title.height -= title.press
-		if title.height >= TITLE_HEIGHT {
-			title.height = TITLE_HEIGHT
-			title.press = 0
-		} else {
-			title.press *= 1.75
-		}
-	}
+    if title.press > 0 {
+        title.height -= title.press 	
+        if title.height < MIN_TITLE_HEIGHT {
+            title.height = MIN_TITLE_HEIGHT
+            title.press = -1
+        } else {
+            title.press /= 1.75
+            if title.press < 0.0001 {
+                title.press = -1
+            }
+        }
+    }
+    if title.press < 0 {
+        title.height -= title.press
+        if title.height >= TITLE_HEIGHT {
+            title.height = TITLE_HEIGHT
+            title.press = 0
+        } else {
+            title.press *= 1.75
+        }
+    }
 
-	// Update Pos and Veloc if it's moving or has accel
-	if ((title.veloc != {}) || (title.accel != {})) && title.press == 0 {
-		title.pos += title.veloc
-		title.veloc += title.accel
+    // Update Pos and Veloc if it's moving or has accel
+    if ((title.veloc != {}) || (title.accel != {})) && title.press == 0 {
+        title.pos += title.veloc
+        title.veloc += title.accel
 	     
-		// take care of landing
-		if title.veloc.y > 0 && Vec2LenSq(title.pos - title.dest) < Vec2LenSq(title.veloc)/2 {
-		    title.press = title.veloc.y*0.5
-		    title.pos = title.dest
-			if title.veloc.y >= 2 {
-		        title.veloc.y *= -0.5 
-			} else {
-			    title.press = 0
-			    title.veloc, title.accel = {}, {}
-			}
-		}
-	}
+        // take care of landing
+        if title.veloc.y > 0 && Vec2LenSq(title.pos - title.dest) < Vec2LenSq(title.veloc)/2 {
+            title.press = title.veloc.y*0.5
+            title.pos = title.dest
+            if title.veloc.y >= 2 {
+                title.veloc.y *= -0.5 
+            } else {
+                title.press = 0
+                title.veloc, title.accel = {}, {}
+            }
+        }
+    }
 }
 
 drawTitle :: proc(title: ^TitleLogo) {
@@ -382,45 +382,44 @@ resqueAt :: proc(board, resqued: ^[BOARD_SIZE]^Animal, resqueIndex, numAnimalLef
 }
 
 drawAnimal :: proc(anim: ^Animal) {
-	colorBitfield := anim.type >> NUM_KIND
-	kindBitfield := anim.type & 0b1111
-	colorOffset := NUM_COLOR - 1 - findFirst1Bit(colorBitfield)
-	kindOffset := NUM_KIND - 1 - findFirst1Bit(kindBitfield)
+    colorBitfield := anim.type >> NUM_KIND
+    kindBitfield := anim.type & 0b1111
+    colorOffset := NUM_COLOR - 1 - findFirst1Bit(colorBitfield)
+    kindOffset := NUM_KIND - 1 - findFirst1Bit(kindBitfield)
     srcRect := rl.Rectangle{f32(kindOffset)*ANIM_SIZE, f32(colorOffset)*ANIM_SIZE,
                             ANIM_SIZE, ANIM_SIZE}
 	
-	if anim.totalJumpFrames > 0 {
-		if anim.currJumpFrame <= anim.ascFrames {
-			anim.scale += JUMP_SCALE_INC_RATE
-			if anim.currJumpFrame == anim.ascFrames { 
-				anim.scaleDecRate = (anim.scale - 1) / 
-									f32(anim.totalJumpFrames - anim.ascFrames)
-			}
-		} else {
-			anim.scale -= anim.scaleDecRate 
-			if anim.scale < 1 { anim.scale = 1 }
-		}
-	}
+    if anim.totalJumpFrames > 0 {
+        if anim.currJumpFrame <= anim.ascFrames {
+            anim.scale += JUMP_SCALE_INC_RATE
+            if anim.currJumpFrame == anim.ascFrames { 
+                anim.scaleDecRate = (anim.scale - 1) / f32(anim.totalJumpFrames - anim.ascFrames)
+            }
+        } else {
+            anim.scale -= anim.scaleDecRate 
+            if anim.scale < 1 { anim.scale = 1 }
+        }
+    }
 	
-	sc := anim.scale
-	animOrigin := anim.pos - Vec2{sc*ANIM_SIZE*0.5, sc*ANIM_SIZE*0.5}
-	desPos := animOrigin + Vec2{0, sc*ANIM_SIZE - sc*anim.height}
-	desRect := rl.Rectangle{desPos.x, desPos.y, sc*ANIM_SIZE, sc*anim.height}
+    sc := anim.scale
+    animOrigin := anim.pos - Vec2{sc*ANIM_SIZE*0.5, sc*ANIM_SIZE*0.5}
+    desPos := animOrigin + Vec2{0, sc*ANIM_SIZE - sc*anim.height}
+    desRect := rl.Rectangle{desPos.x, desPos.y, sc*ANIM_SIZE, sc*anim.height}
 
-	rl.DrawTexturePro(textures.AnimalsTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
+    rl.DrawTexturePro(textures.AnimalsTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
 	
-	// Draw dust
-	if anim.dustDuration != 0 { 
-		srcRect := rl.Rectangle{0, 0, DUST_IMAGE_WIDTH, DUST_IMAGE_HEIGHT}
-		desRect := rl.Rectangle{anim.x - ANIM_SIZE*0.7, anim.y + ANIM_SIZE*0.4, 
-								ANIM_SIZE*0.5, ANIM_SIZE*0.15} 
-		rl.DrawTexturePro(textures.DustTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
+    // Draw dust
+    if anim.dustDuration != 0 { 
+        srcRect := rl.Rectangle{0, 0, DUST_IMAGE_WIDTH, DUST_IMAGE_HEIGHT}
+        desRect := rl.Rectangle{anim.x - ANIM_SIZE*0.7, anim.y + ANIM_SIZE*0.4, 
+                                ANIM_SIZE*0.5, ANIM_SIZE*0.15} 
+        rl.DrawTexturePro(textures.DustTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
 
-		desRect = rl.Rectangle{anim.x + ANIM_SIZE*0.2, anim.y + ANIM_SIZE*0.4,  
-							   ANIM_SIZE*0.5, ANIM_SIZE*0.15} 
-		rl.DrawTexturePro(textures.DustTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
-		anim.dustDuration -= 1
-	}
+        desRect = rl.Rectangle{anim.x + ANIM_SIZE*0.2, anim.y + ANIM_SIZE*0.4,  
+                               ANIM_SIZE*0.5, ANIM_SIZE*0.15} 
+        rl.DrawTexturePro(textures.DustTexture, srcRect, desRect, Vec2{}, 0, rl.RAYWHITE)
+        anim.dustDuration -= 1
+    }
 }
 
 isAnimRectClicked :: proc(anim: ^Animal) -> bool {
@@ -445,8 +444,8 @@ loadAssets :: proc() {
     animalsImage := rl.LoadImage("assets/textures/animals.png")
     dustImage := rl.LoadImage("assets/textures/dust.png")
     
-	rl.ImageResize(&titleImage, TITLE_WIDTH, TITLE_HEIGHT)
-	rl.ImageResize(&groundImage, WINDOW_WIDTH, WINDOW_HEIGHT)
+    rl.ImageResize(&titleImage, TITLE_WIDTH, TITLE_HEIGHT)
+    rl.ImageResize(&groundImage, WINDOW_WIDTH, WINDOW_HEIGHT)
     rl.ImageResize(&animalsImage, i32(ANIM_SIZE*NUM_COL), i32(ANIM_SIZE*NUM_ROW))
 
     textures.TitleTexture = rl.LoadTextureFromImage(titleImage)
@@ -454,132 +453,130 @@ loadAssets :: proc() {
     textures.AnimalsTexture = rl.LoadTextureFromImage(animalsImage)
     textures.DustTexture = rl.LoadTextureFromImage(dustImage)
     
-	rl.UnloadImage(titleImage)
-	rl.UnloadImage(groundImage)
+    rl.UnloadImage(titleImage)
+    rl.UnloadImage(groundImage)
     rl.UnloadImage(animalsImage)
     rl.UnloadImage(dustImage)
 
-	sounds.TitleJump = rl.LoadSound("assets/sounds/titlejump.mp3")
-	sounds.TitleLand = rl.LoadSound("assets/sounds/titleland.mp3")
-	sounds.Start = rl.LoadSound("assets/sounds/start.mp3")
-	sounds.Jump = rl.LoadSound("assets/sounds/jump.wav")
-	sounds.BigJump = rl.LoadSound("assets/sounds/bigjump.mp3")
-	sounds.Land = rl.LoadSound("assets/sounds/land.mp3")
-	sounds.BigLand = rl.LoadSound("assets/sounds/bigland.mp3")
-	sounds.Success = rl.LoadSound("assets/sounds/success.mp3")
-	sounds.Fail = rl.LoadSound("assets/sounds/fail.mp3")
-	sounds.Yay = rl.LoadSound("assets/sounds/yay.mp3")
-	sounds.Fail = rl.LoadSound("assets/sounds/fail.mp3")
+    sounds.TitleJump = rl.LoadSound("assets/sounds/titlejump.mp3")
+    sounds.TitleLand = rl.LoadSound("assets/sounds/titleland.mp3")
+    sounds.Start = rl.LoadSound("assets/sounds/start.mp3")
+    sounds.Jump = rl.LoadSound("assets/sounds/jump.wav")
+    sounds.BigJump = rl.LoadSound("assets/sounds/bigjump.mp3")
+    sounds.Land = rl.LoadSound("assets/sounds/land.mp3")
+    sounds.BigLand = rl.LoadSound("assets/sounds/bigland.mp3")
+    sounds.Success = rl.LoadSound("assets/sounds/success.mp3")
+    sounds.Fail = rl.LoadSound("assets/sounds/fail.mp3")
+    sounds.Yay = rl.LoadSound("assets/sounds/yay.mp3")
+    sounds.Fail = rl.LoadSound("assets/sounds/fail.mp3")
 }
 
 unloadSounds :: proc() {
     fieldNames := reflect.struct_field_names(type_of(sounds))
-	for fieldName in fieldNames {
-		rl.UnloadSound(reflect.struct_field_value_by_name(sounds, fieldName).(rl.Sound))
+    for fieldName in fieldNames {
+        rl.UnloadSound(reflect.struct_field_value_by_name(sounds, fieldName).(rl.Sound))
     }
 }
 
 findLastRowEmpties :: proc(board: ^[BOARD_SIZE]^Animal, empties: ^[NUM_COL]bool) -> (emptyColCount: int) {
-	for i := 0; i < NUM_COL; i += 1 {
-		if board[i] == nil {
-			empties[i] = true
-			emptyColCount += 1
-		}
-	}
-	return
+    for i := 0; i < NUM_COL; i += 1 {
+        if board[i] == nil {
+            empties[i] = true
+            emptyColCount += 1
+        }
+    }
+    return
 }
 
 moveResquedToBoard :: proc(board, resqued: ^[BOARD_SIZE]^Animal, boardIndex, resquedIndex: int,
-                        numAnimalLeft: ^u8, resquedChanged: ^bool) {
+                           numAnimalLeft: ^u8, resquedChanged: ^bool) {
     i := boardIndex
-	animToPush := resqued[resquedIndex]
-	resqued[resquedIndex] = nil
+    animToPush := resqued[resquedIndex]
+    resqued[resquedIndex] = nil
 
     for i >= 0 {
-		nextAnimToPush := board[i]
-		board[i] = animToPush
-		if nextAnimToPush != nil {
-			jumpAnimal(nextAnimToPush, 
-			           nextAnimToPush.pos - Vec2{0, ROW_HEIGHT}, 
-					   20, 12) 
-			animToPush = nextAnimToPush
-			i -= NUM_COL
-		} else { 
-			break 
-		}
-	}
+        nextAnimToPush := board[i]
+        board[i] = animToPush
+        if nextAnimToPush != nil {
+            jumpAnimal(nextAnimToPush, nextAnimToPush.pos - Vec2{0, ROW_HEIGHT}, 20, 12) 
+            animToPush = nextAnimToPush
+            i -= NUM_COL
+        } else { 
+            break 
+        }
+    }
 
-	numAnimalLeft^ += 1
-	resquedChanged^ = true
+    numAnimalLeft^ += 1
+    resquedChanged^ = true
 }
 
 scatterResqued :: proc(board, resqued: ^[BOARD_SIZE]^Animal, maxIndexToScatter: int, 
-                    frontRowPos: ^[NUM_COL]Vec2, numAnimalLeft: ^u8, resquedChanged: ^bool) {
-	lastRowEmptyIndices := [NUM_COL]bool{}
-	emptyCount := findLastRowEmpties(board, &lastRowEmptyIndices)
+                       frontRowPos: ^[NUM_COL]Vec2, numAnimalLeft: ^u8, resquedChanged: ^bool) {
+    lastRowEmptyIndices := [NUM_COL]bool{}
+    emptyCount := findLastRowEmpties(board, &lastRowEmptyIndices)
     indexToMoveToBoard := maxIndexToScatter
 
-	for i := 0; i < NUM_COL; i += 1 {
-		if lastRowEmptyIndices[i] {
-			jumpAnimal(resqued[indexToMoveToBoard], frontRowPos[i], 24, 16)
-			frontRowIndexToJump := BOARD_SIZE - NUM_COL + i
-			moveResquedToBoard(board, resqued, frontRowIndexToJump, indexToMoveToBoard,
-		                       numAnimalLeft, resquedChanged)
-			indexToMoveToBoard -= 1
-			emptyCount -= 1
-			if indexToMoveToBoard < 0 || emptyCount < 1  { 
-				break
-			}
-		}
-	}
+    for i := 0; i < NUM_COL; i += 1 {
+        if lastRowEmptyIndices[i] {
+            jumpAnimal(resqued[indexToMoveToBoard], frontRowPos[i], 24, 16)
+            frontRowIndexToJump := BOARD_SIZE - NUM_COL + i
+            moveResquedToBoard(board, resqued, frontRowIndexToJump, indexToMoveToBoard,
+                               numAnimalLeft, resquedChanged)
+            indexToMoveToBoard -= 1
+            emptyCount -= 1
+            if indexToMoveToBoard < 0 || emptyCount < 1  { 
+                break
+            }
+        }
+    }
 
-	resqued[indexToMoveToBoard + 1] = resqued[maxIndexToScatter + 1]
-	resqued[maxIndexToScatter + 1] = nil
+    resqued[indexToMoveToBoard + 1] = resqued[maxIndexToScatter + 1]
+    resqued[maxIndexToScatter + 1] = nil
 }
 
 updateAnimState :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SIZE]^Animal, 
-                     frontRowPos: ^[NUM_COL]Vec2, gpState: ^GamePlayState) -> bool {
-	using gpState
+                        frontRowPos: ^[NUM_COL]Vec2, gpState: ^GamePlayState) -> bool {
+    using gpState
     isAllUpdated := true
 
-	for _, i in animals {
-		anim := &animals[i]
-		// Update Press and Height 
-		if anim.press > 0 {
-			anim.height -= anim.press 	
-			if anim.height < MIN_ANIM_HEIGHT {
-				anim.height = MIN_ANIM_HEIGHT
-			}
-			anim.press *= 0.5
-			if anim.press < 0.0001 {
-				anim.press = -1
-			}
-		}
-		if anim.press < 0 {
-			if anim.height - anim.press >= ANIM_SIZE {
-				anim.height = ANIM_SIZE
-				anim.press = 0
-			} else {
-				anim.height -= anim.press
-				anim.press *= 2
-			}
-		}
+    for _, i in animals {
+        anim := &animals[i]
+        // Update Press and Height 
+        if anim.press > 0 {
+            anim.height -= anim.press 	
+            if anim.height < MIN_ANIM_HEIGHT {
+                anim.height = MIN_ANIM_HEIGHT
+            }
+            anim.press *= 0.5
+            if anim.press < 0.0001 {
+                anim.press = -1
+            }
+        }
+        if anim.press < 0 {
+            if anim.height - anim.press >= ANIM_SIZE {
+                anim.height = ANIM_SIZE
+                anim.press = 0
+            } else {
+                anim.height -= anim.press
+                anim.press *= 2
+            }
+        }
 
-		// Update Pos and Veloc if it's moving or has accel
-		if !(anim.veloc == {}) || !(anim.accel == {}) {
-			isAllUpdated = false
-			anim.pos += anim.veloc
-			anim.veloc += anim.accel
-			if anim.totalJumpFrames > 0 { anim.currJumpFrame += 1 }
+        // Update Pos and Veloc if it's moving or has accel
+        if !(anim.veloc == {}) || !(anim.accel == {}) {
+            isAllUpdated = false
+            anim.pos += anim.veloc
+            anim.veloc += anim.accel
+            if anim.totalJumpFrames > 0 { anim.currJumpFrame += 1 }
 
-			// Take care of landing
-			if Vec2LenSq(anim.pos - anim.dest) < Vec2LenSq(anim.veloc)/2 {
+            // Take care of landing
+            if Vec2LenSq(anim.pos - anim.dest) < Vec2LenSq(anim.veloc)/2 {
                 if gameMode == GameMode.GAME_PLAY && 
                    anim.ascFrames > anim.totalJumpFrames/2 && anim.dest.y == FRONT_ROW_Y {
                     rl.PlaySound(sounds.Yay)
                 }
                 if anim.veloc.y <= FPS {
-				    if anim.veloc.y > FPS/2 { 
+                    if anim.veloc.y > FPS/2 { 
                         anim.press = anim.veloc.y/3 
                         if gameMode == GameMode.GAME_PLAY { rl.PlaySound(sounds.Land) }
                     }
@@ -592,51 +589,51 @@ updateAnimState :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SI
                         rl.PlaySound(sounds.Land) 
                     }
                 }
-				// if the landing animal is the last resqued(the one crossing the bridge)
-				lastResquedIndex := BOARD_SIZE - 1 - numAnimalLeft
-				if gameMode == GameMode.GAME_PLAY && lastResquedIndex > 0 && 
-				   anim == resqued[lastResquedIndex] {
-					// when a big jump is made, send previously resqued animals back to the land
-				    if anim.veloc.y > FPS && gpState.bigJumpLeft > 0 {
+                // if the landing animal is the last resqued(the one crossing the bridge)
+                lastResquedIndex := BOARD_SIZE - 1 - numAnimalLeft
+                if gameMode == GameMode.GAME_PLAY && lastResquedIndex > 0 && 
+                   anim == resqued[lastResquedIndex] {
+                    // when a big jump is made, send previously resqued animals back to the land
+                        if anim.veloc.y > FPS && gpState.bigJumpLeft > 0 {
                         bigJumpMade = true
                         scatterResqued(board, resqued, int(lastResquedIndex - 1), frontRowPos,
                                        &numAnimalLeft, &resquedChanged)
                         bigJumpLeft -= 1
                         if lastMsgShown && bigJumpLeft == 1 { setMsg(GameMode.GAME_PLAY, 3) }
                         if bigJumpLeft == 0 { setMsg(GameMode.GAME_PLAY, 4) }
-				    } else {
-					    // For regular jumps, compress and move the previously resqued sideway
-						prevAnimIndex := lastResquedIndex - 1
-						prevAnim := resqued[prevAnimIndex]
-						prevAnim.press = ANIM_SIZE
-						pushFactor := f32(prevAnimIndex/2 + 1)
+                    } else {
+                        // For regular jumps, compress and move the previously resqued sideway
+                        prevAnimIndex := lastResquedIndex - 1
+                        prevAnim := resqued[prevAnimIndex]
+                        prevAnim.press = ANIM_SIZE
+                        pushFactor := f32(prevAnimIndex/2 + 1)
                         pushDist := Vec2{pushFactor*ANIM_SIZE*0.25, 0}
                         pushAccel := Vec2{pushFactor*ANIM_SIZE*0.075, 0}
                         pushVeloc := Vec2{pushFactor*ANIM_SIZE*0.15, 0}
-						if prevAnimIndex % 2 == 0 {
-							prevAnim.dest = prevAnim.pos - pushDist
-							prevAnim.accel = pushAccel 
-							prevAnim.veloc = -pushVeloc
-						} else {
-							prevAnim.dest = prevAnim.pos + pushDist
-							prevAnim.accel = -pushAccel
-							prevAnim.veloc = pushVeloc 
-						}
-					}
-				}
+                        if prevAnimIndex % 2 == 0 {
+                            prevAnim.dest = prevAnim.pos - pushDist
+                            prevAnim.accel = pushAccel 
+                            prevAnim.veloc = -pushVeloc
+                        } else {
+                            prevAnim.dest = prevAnim.pos + pushDist
+                            prevAnim.accel = -pushAccel
+                            prevAnim.veloc = pushVeloc 
+                        }
+                    }
+                }
 
-				anim.pos = anim.dest
-				anim.veloc, anim.accel = {}, {}
-				anim.scale = 1
-				anim.scaleDecRate = 0
-				anim.totalJumpFrames = 0
-				anim.ascFrames = 0
-				anim.currJumpFrame = 0
-			}
-		}
-	}
+                anim.pos = anim.dest
+                anim.veloc, anim.accel = {}, {}
+                anim.scale = 1
+                anim.scaleDecRate = 0
+                anim.totalJumpFrames = 0
+                anim.ascFrames = 0
+                anim.currJumpFrame = 0
+            }
+        }
+    }
 
-	return isAllUpdated
+    return isAllUpdated
 }
 
 resetAnimalsAndBoard :: proc(animals: ^[BOARD_SIZE]Animal, board, resqued: ^[BOARD_SIZE]^Animal,
@@ -657,356 +654,351 @@ resetGamePlayState :: proc(board: ^[BOARD_SIZE]^Animal, gpState: ^GamePlayState)
 }
 
 processKeyDown :: proc(anim: ^Animal) {
-	anim.press = anim.height*0.05
-	if anim.height < MIN_JUMP_HEIGHT { anim.height = MIN_JUMP_HEIGHT } 
+    anim.press = anim.height*0.05
+    if anim.height < MIN_JUMP_HEIGHT { anim.height = MIN_JUMP_HEIGHT } 
 }
 
 addMsg :: proc(duration: int, gameMode: GameMode, l1, l2: string) {
-	append(&scripts.msgs[gameMode], Message{l1, l2, duration, 1, false, 0, gameMode})
+    append(&scripts.msgs[gameMode], Message{l1, l2, duration, 1, false, 0, gameMode})
 }
 
 setMsg :: proc(gameMode: GameMode, msgNum: int) {
     if msgNum >= len(scripts.msgs[gameMode]) {
-		when ODIN_DEBUG {
-		    fmt.printf("msgNum %d is greater than the msg len for game gameMode %d!\n", msgNum, gameMode)
-	    }
-		msg = {}
-	} else {
-	    msg = scripts.msgs[gameMode][msgNum]
-	}
+        when ODIN_DEBUG {
+            fmt.printf("msgNum %d is greater than the msg len for game gameMode %d!\n", msgNum, gameMode)
+        }
+        msg = {}
+    } else {
+        msg = scripts.msgs[gameMode][msgNum]
+    }
 }
 
 setTitleAnims :: proc(titleAnims: ^[3]^Animal, tstate: ^TitleState) {
-	for i := 0; i < 3; i += 1 {
-	    tstate.destForOpening[i] = titleAnims[i].dest 
-	}
+    for i := 0; i < 3; i += 1 {
+        tstate.destForOpening[i] = titleAnims[i].dest 
+    }
 
-	titleAnims[0].dest = Vec2{WINDOW_WIDTH*0.25*3, TITLE_LANDING_Y + TITLE_HEIGHT - ANIM_SIZE/3} 
-	titleAnims[1].dest = Vec2{WINDOW_WIDTH*0.25*1.5, TITLE_LANDING_Y + TITLE_HEIGHT - ANIM_SIZE/3} 
-	titleAnims[2].dest = Vec2{WINDOW_WIDTH*0.5, TITLE_LANDING_Y - TITLE_HEIGHT*0.25 + ANIM_SIZE*0.5} 
+    titleAnims[0].dest = Vec2{WINDOW_WIDTH*0.25*3, TITLE_LANDING_Y + TITLE_HEIGHT - ANIM_SIZE/3} 
+    titleAnims[1].dest = Vec2{WINDOW_WIDTH*0.25*1.5, TITLE_LANDING_Y + TITLE_HEIGHT - ANIM_SIZE/3} 
+    titleAnims[2].dest = Vec2{WINDOW_WIDTH*0.5, TITLE_LANDING_Y - TITLE_HEIGHT*0.25 + ANIM_SIZE*0.5} 
 }
 
 
 main :: proc() {
-	title := TitleLogo{}
-	setTitleLogo(&title)
+    title := TitleLogo{}
+    setTitleLogo(&title)
 
-	animals := [BOARD_SIZE]Animal{}
-	board := [BOARD_SIZE]^Animal{}
-	resqued := [BOARD_SIZE]^Animal{}
-	frontRowPos := [NUM_COL]Vec2{}
-	resetAnimalsAndBoard(&animals, &board, &resqued, &frontRowPos)
+    animals := [BOARD_SIZE]Animal{}
+    board := [BOARD_SIZE]^Animal{}
+    resqued := [BOARD_SIZE]^Animal{}
+    frontRowPos := [NUM_COL]Vec2{}
+    resetAnimalsAndBoard(&animals, &board, &resqued, &frontRowPos)
 
-	tstate := TitleState{}
-	firstRow := BOARD_SIZE - NUM_COL
-	titleAnims :=[3]^Animal{board[firstRow], board[firstRow+2], board[firstRow+1]}
-	setTitleAnims(&titleAnims, &tstate) 
+    tstate := TitleState{}
+    firstRow := BOARD_SIZE - NUM_COL
+    titleAnims :=[3]^Animal{board[firstRow], board[firstRow+2], board[firstRow+1]}
+    setTitleAnims(&titleAnims, &tstate) 
 
-	addMsg(INDEFINITE, GameMode.TITLE, "Press Space or Click anywhere to play", "")
-	addMsg(INDEFINITE, GameMode.GAME_PLAY, "Pick one from the front row carefully", 
-	       "The following has to be same kind or color")
-	addMsg(INDEFINITE, GameMode.GAME_PLAY, "Press and hold for BIG JUMP", "")
-	addMsg(FPS*5, GameMode.GAME_PLAY, "Yay! Do BIG JUMP before getting stuck", "You have one more BIG JUMP")
-	addMsg(FPS*5, GameMode.GAME_PLAY, "Only one more BIG JUMP left!", "Please, use it wisely...")
-	addMsg(FPS*5, GameMode.GAME_PLAY, "Ugh.. No more BIG JUMP!!!", "")
-	addMsg(INDEFINITE, GameMode.GAME_CLEAR, "All animals have crossed!",
+    addMsg(INDEFINITE, GameMode.TITLE, "Press Space or Click anywhere to play", "")
+    addMsg(INDEFINITE, GameMode.GAME_PLAY, "Pick one from the front row carefully", 
+           "The following has to be same kind or color")
+    addMsg(INDEFINITE, GameMode.GAME_PLAY, "Press and hold for BIG JUMP", "")
+    addMsg(FPS*5, GameMode.GAME_PLAY, "Yay! Do BIG JUMP before getting stuck", "You have one more BIG JUMP")
+    addMsg(FPS*5, GameMode.GAME_PLAY, "Only one more BIG JUMP left!", "Please, use it wisely...")
+    addMsg(FPS*5, GameMode.GAME_PLAY, "Ugh.. No more BIG JUMP!!!", "")
+    addMsg(INDEFINITE, GameMode.GAME_CLEAR, "All animals have crossed!",
            "Press G or click the last one to play again!")
-	addMsg(INDEFINITE, GameMode.GAME_OVER, "Oops, it's a dead-end!",
+    addMsg(INDEFINITE, GameMode.GAME_OVER, "Oops, it's a dead-end!",
            "Press G or click the last one to try again!")
-	msg.gameMode = GameMode.TITLE
+    msg.gameMode = GameMode.TITLE
 
-	gameMode = GameMode.TITLE 
-	openingFrame := 0
+    gameMode = GameMode.TITLE 
+    openingFrame := 0
     gameClearFrame := 0
-	isQuitting := false
-	willReplay := false
-	isAllAnimUpdated := true
+    isQuitting := false
+    willReplay := false
+    isAllAnimUpdated := true
 
     gpState := GamePlayState{}
-	gpState.numAnimalLeft = BOARD_SIZE
+    gpState.numAnimalLeft = BOARD_SIZE
     gpState.resquableIndex = {}
     gpState.bigJumpLeft = TOTAL_BIG_JUMP
-	gpState.firstMoveMade, gpState.bigJumpMade, gpState.lastMsgShown = false, false, false
-	gpState.resquedChanged = true
-	gpState.mostRecentResqueType = u8(0xFF)  // initially, all front row animals can be resqued.
+    gpState.firstMoveMade, gpState.bigJumpMade, gpState.lastMsgShown = false, false, false
+    gpState.resquedChanged = true
+    gpState.mostRecentResqueType = u8(0xFF)  // initially, all front row animals can be resqued.
     gpState.numNextMoves = findResquables(&board, gpState.mostRecentResqueType, &gpState.resquableIndex)
-	when ODIN_DEBUG { fmt.printf("numPossibleMoves: %d, %v\n", gpState.numNextMoves, gpState.resquableIndex) }
+    when ODIN_DEBUG { fmt.printf("numPossibleMoves: %d, %v\n", gpState.numNextMoves, gpState.resquableIndex) }
 
     rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Animal Logic")
     rl.SetTargetFPS(FPS)
-	rl.InitAudioDevice();
-	loadAssets();
+    rl.InitAudioDevice();
+    loadAssets();
     
     // Game loop
     for !isQuitting && !rl.WindowShouldClose() {
 
-		if msg.frames > 0 {
-			if msg.duration != INDEFINITE && msg.frames > msg.duration && msg.alpha < 2 { 
-				msg = {}
-			} else { 
-				msg.frames += 1
-			}
-	    }
+        if msg.frames > 0 {
+            if msg.duration != INDEFINITE && msg.frames > msg.duration && msg.alpha < 2 { 
+                msg = {}
+            } else { 
+                msg.frames += 1
+            }
+        }
 
-	    switch gameMode {
+        switch gameMode {
 
-			// title mode
-			case GameMode.TITLE:
+            // title mode
+            case GameMode.TITLE:
 	
-			if tstate.animToDrop < 2 && (tstate.titleFrame == 20 || tstate.titleFrame == 40) { 
-				anim := titleAnims[tstate.animToDrop]
-				jumpAnimal(anim, anim.dest, 20, 7)
-				tstate.animToDrop += 1
-				if tstate.animToDrop == 2 { tstate.titleDropFrame = tstate.titleFrame + FPS }
-			}
-			if tstate.animToDrop == 2 && tstate.titleFrame == tstate.titleDropFrame { 
-				title.accel = {0, 1}
-				tstate.firstCompressFrame = tstate.titleFrame + 0.4*FPS
-			}
-			if tstate.animToDrop == 2 && tstate.titleFrame == tstate.firstCompressFrame {
+            if tstate.animToDrop < 2 && (tstate.titleFrame == 20 || tstate.titleFrame == 40) { 
+                anim := titleAnims[tstate.animToDrop]
+                jumpAnimal(anim, anim.dest, 20, 7)
+                tstate.animToDrop += 1
+                if tstate.animToDrop == 2 { tstate.titleDropFrame = tstate.titleFrame + FPS }
+            }
+            if tstate.animToDrop == 2 && tstate.titleFrame == tstate.titleDropFrame { 
+                title.accel = {0, 1}
+                tstate.firstCompressFrame = tstate.titleFrame + 0.4*FPS
+            }
+            if tstate.animToDrop == 2 && tstate.titleFrame == tstate.firstCompressFrame {
                 rl.PlaySound(sounds.TitleLand)
-				anim0, anim1 := titleAnims[0], titleAnims[1] 
-				anim0.press = ANIM_SIZE*0.75
-				anim0.veloc = {15, 0}
-				anim0.accel = {-1.5, 0}
-				anim0.dest = {75 + anim0.pos.x, anim0.pos.y}
-				anim1.dest = {anim1.pos.x - 125, anim1.pos.y}
-				jumpAnimal(anim1, anim1.dest, 14, 8)
-				tstate.lastAnimDropFrame = tstate.titleFrame + 3*FPS
-			}
-			if tstate.animToDrop == 2 && tstate.titleFrame == tstate.lastAnimDropFrame {
-				anim := titleAnims[tstate.animToDrop]
-				jumpAnimal(anim, anim.dest, 20, 6)
-				tstate.titlePressFrame = tstate.titleFrame + 0.3*FPS	
-			}
-			if tstate.animToDrop == 2 && tstate.titleFrame == tstate.titlePressFrame {
+                anim0, anim1 := titleAnims[0], titleAnims[1] 
+                anim0.press = ANIM_SIZE*0.75
+                anim0.veloc = {15, 0}
+                anim0.accel = {-1.5, 0}
+                anim0.dest = {75 + anim0.pos.x, anim0.pos.y}
+                anim1.dest = {anim1.pos.x - 125, anim1.pos.y}
+                jumpAnimal(anim1, anim1.dest, 14, 8)
+                tstate.lastAnimDropFrame = tstate.titleFrame + 3*FPS
+            }
+            if tstate.animToDrop == 2 && tstate.titleFrame == tstate.lastAnimDropFrame {
+                anim := titleAnims[tstate.animToDrop]
+                jumpAnimal(anim, anim.dest, 20, 6)
+                tstate.titlePressFrame = tstate.titleFrame + 0.3*FPS	
+            }
+            if tstate.animToDrop == 2 && tstate.titleFrame == tstate.titlePressFrame {
                 rl.PlaySound(sounds.TitleJump)
-				title.press = 12.5
-				tstate.lastAnimJumpFrame = tstate.titleFrame + 0.2*FPS
-			}
-			if tstate.animToDrop == 2 && tstate.titleFrame == tstate.lastAnimJumpFrame {
-				anim := titleAnims[2]
-				jumpAnimal(anim, titleAnims[1].pos, 24, 11)
-				tstate.animToDrop += 1
-				tstate.secondCompressFrame = tstate.titleFrame + 24
-			}
-			if tstate.animToDrop == 3 && tstate.titleFrame == tstate.secondCompressFrame {
-				anim := titleAnims[1]
-				anim0 := titleAnims[0]
-				anim.press = ANIM_SIZE*0.75
-				anim.veloc = {30, 0}
-				anim.accel = {-1, 0}
-				anim.dest = {anim0.x, anim.y}
-				tstate.fallOutFrame = tstate.titleFrame + 24
-			}
-			if tstate.animToDrop == 3 && tstate.titleFrame == tstate.fallOutFrame {
-				anim := titleAnims[0]
-				jumpAnimal(anim, Vec2{RESQUE_SPOT_X, RESQUE_SPOT_Y}, 26, 8)
-				tstate.sceneEnd = true
-			}
+                title.press = 12.5
+                tstate.lastAnimJumpFrame = tstate.titleFrame + 0.2*FPS
+            }
+            if tstate.animToDrop == 2 && tstate.titleFrame == tstate.lastAnimJumpFrame {
+                anim := titleAnims[2]
+                jumpAnimal(anim, titleAnims[1].pos, 24, 11)
+                tstate.animToDrop += 1
+                tstate.secondCompressFrame = tstate.titleFrame + 24
+            }
+            if tstate.animToDrop == 3 && tstate.titleFrame == tstate.secondCompressFrame {
+                anim := titleAnims[1]
+                anim0 := titleAnims[0]
+                anim.press = ANIM_SIZE*0.75
+                anim.veloc = {30, 0}
+                anim.accel = {-1, 0}
+                anim.dest = {anim0.x, anim.y}
+                tstate.fallOutFrame = tstate.titleFrame + 24
+            }
+            if tstate.animToDrop == 3 && tstate.titleFrame == tstate.fallOutFrame {
+                anim := titleAnims[0]
+                jumpAnimal(anim, Vec2{RESQUE_SPOT_X, RESQUE_SPOT_Y}, 26, 8)
+                tstate.sceneEnd = true
+            }
 			
-			updateTitle(&title)
-			
-			if tstate.sceneEnd && isAllAnimUpdated {
-				if !tstate.titleMessageShown {
-					setMsg(gameMode, 0)
-					tstate.titleMessageShown = true
-				}
-			    if rl.IsKeyReleased(KEY_SPACE) || rl.IsMouseButtonReleased(MOUSE_L) {
-					when ODIN_DEBUG { fmt.println("Space released!") }
+            updateTitle(&title)
+		    
+            if tstate.sceneEnd && isAllAnimUpdated {
+                if !tstate.titleMessageShown {
+                    setMsg(gameMode, 0)
+                    tstate.titleMessageShown = true
+                }
+                if rl.IsKeyReleased(KEY_SPACE) || rl.IsMouseButtonReleased(MOUSE_L) {
+                    when ODIN_DEBUG { fmt.println("Space released!") }
                     rl.PlaySound(sounds.Start)
-					for _, i in titleAnims { titleAnims[i].dest = tstate.destForOpening[i] }
-					gameMode = GameMode.OPENING
-				}
-			}
+                    for _, i in titleAnims { titleAnims[i].dest = tstate.destForOpening[i] }
+                    gameMode = GameMode.OPENING
+                }
+            }
 
-			tstate.titleFrame += 1
+            tstate.titleFrame += 1
 
-			// opening mode
-		    case GameMode.OPENING:
+            // opening mode
+            case GameMode.OPENING:
 
-			frameDiv := openingFrame / 10
-			frameMod := openingFrame % 10
-			if frameDiv < BOARD_SIZE {
-				anim := &animals[frameDiv]
-				if frameMod == 0 {
-					if anim == titleAnims[0] {
-						jumpAnimal(anim, anim.dest, 24, 16)
-					} else {
-					    jumpAnimal(anim, anim.dest, 20, 4)
-					}
-				}
-			    openingFrame += 1
-			} else if isAllAnimUpdated {
-				openingFrame = 0
-				gameMode = GameMode.GAME_PLAY
-			}
+            frameDiv := openingFrame / 10
+            frameMod := openingFrame % 10
+            if frameDiv < BOARD_SIZE {
+                anim := &animals[frameDiv]
+                if frameMod == 0 {
+                    if anim == titleAnims[0] {
+                        jumpAnimal(anim, anim.dest, 24, 16)
+                    } else {
+                        jumpAnimal(anim, anim.dest, 20, 4)
+                    }
+                }
+                openingFrame += 1
+            } else if isAllAnimUpdated {
+                openingFrame = 0
+                gameMode = GameMode.GAME_PLAY
+            }
 
-			// gameplay mode
-		    case GameMode.GAME_PLAY:
+            // gameplay mode
+            case GameMode.GAME_PLAY:
 
             if msg.gameMode != gameMode { 
                 msg.gameMode = gameMode
                 msg.frames = 0
             }
 
-			if isAllAnimUpdated {
-				if !gpState.firstMoveMade && msg.frames == 0 {
-					setMsg(gameMode, 0)
-				}
+            if isAllAnimUpdated {
+                if !gpState.firstMoveMade && msg.frames == 0 { setMsg(gameMode, 0) }
 
                 // After new move is made, check the message states and get the new possible next moves
-				if gpState.numAnimalLeft < BOARD_SIZE && gpState.resquedChanged { 
-					assert(resqued[BOARD_SIZE - gpState.numAnimalLeft - 1] != nil)
+                if gpState.numAnimalLeft < BOARD_SIZE && gpState.resquedChanged { 
+                    assert(resqued[BOARD_SIZE - gpState.numAnimalLeft - 1] != nil)
 					
-					if !gpState.firstMoveMade {
-						gpState.firstMoveMade = true
-					    setMsg(gameMode, 1)
-					}
-					if !gpState.bigJumpMade && gpState.numAnimalLeft < BOARD_SIZE - 1 { 
-					    setMsg(gameMode, 1)
-					}
-					if gpState.bigJumpMade && !gpState.lastMsgShown{
-						gpState.lastMsgShown = true
-					    setMsg(gameMode, 2)
-					}
+                    if !gpState.firstMoveMade {
+                        gpState.firstMoveMade = true
+                        setMsg(gameMode, 1)
+                    }
+                    if !gpState.bigJumpMade && gpState.numAnimalLeft < BOARD_SIZE - 1 { 
+                        setMsg(gameMode, 1)
+                    }
+                    if gpState.bigJumpMade && !gpState.lastMsgShown{
+                        gpState.lastMsgShown = true
+                        setMsg(gameMode, 2)
+                    }
 
-					gpState.mostRecentResqueType = resqued[BOARD_SIZE - gpState.numAnimalLeft - 1].type
-					for _, i in gpState.resquableIndex { gpState.resquableIndex[i] = 0 }
-					gpState.numNextMoves = findResquables(&board,
-                                                            gpState.mostRecentResqueType, 
-                                                            &gpState.resquableIndex)
-					gpState.resquedChanged = false
-					if gpState.numAnimalLeft == 0 {
+                    gpState.mostRecentResqueType = resqued[BOARD_SIZE - gpState.numAnimalLeft - 1].type
+                    for _, i in gpState.resquableIndex { gpState.resquableIndex[i] = 0 }
+                    gpState.numNextMoves = findResquables(&board,gpState.mostRecentResqueType, 
+                                                          &gpState.resquableIndex)
+                    gpState.resquedChanged = false
+                    if gpState.numAnimalLeft == 0 {
                         rl.PlaySound(sounds.Success)
-						gameMode = GameMode.GAME_CLEAR
-					} else if gpState.numNextMoves == 0 {
+                        gameMode = GameMode.GAME_CLEAR
+                    } else if gpState.numNextMoves == 0 {
                         rl.PlaySound(sounds.Fail)
-						gameMode = GameMode.GAME_OVER
-					}
+                        gameMode = GameMode.GAME_OVER
+                    }
 
-					when ODIN_DEBUG {
-					    fmt.printf("numNextMoves: %d, %v\n", gpState.numNextMoves, gpState.resquableIndex)
-					    fmt.printf("numAnimalLeft: %d\n", gpState.numAnimalLeft)
-					    printbd(&board)
-					}
-			    }
+                    when ODIN_DEBUG {
+                        fmt.printf("numNextMoves: %d, %v\n", gpState.numNextMoves, gpState.resquableIndex)
+                        fmt.printf("numAnimalLeft: %d\n", gpState.numAnimalLeft)
+                        printbd(&board)
+                    }
+                }
 
                 // KeyDown event 
-				if rl.IsKeyDown(KEY_A) || (rl.IsMouseButtonDown(MOUSE_L) && 
-				   isAnimRectClicked(board[FRONT_ROW_BASEINDEX])) {
-					when ODIN_DEBUG { fmt.println("A pressed!") }
-					if gpState.resquableIndex[0] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX]) }
-				} else if rl.IsKeyDown(KEY_S) || (rl.IsMouseButtonDown(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX+1])) {
-					when ODIN_DEBUG { fmt.println("S pressed!") }
-					if gpState.resquableIndex[1] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX+1]) }
-				} else if rl.IsKeyDown(KEY_D) || (rl.IsMouseButtonDown(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX+2])) {
-					when ODIN_DEBUG { fmt.println("D pressed!") }
-					if gpState.resquableIndex[2] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX+2]) }
-				} else if rl.IsKeyDown(KEY_F) || (rl.IsMouseButtonDown(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX+3])) {
-					when ODIN_DEBUG { fmt.println("F pressed!") }
-					if gpState.resquableIndex[3] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX+3]) }
+                if rl.IsKeyDown(KEY_A) || (rl.IsMouseButtonDown(MOUSE_L) && 
+                   isAnimRectClicked(board[FRONT_ROW_BASEINDEX])) {
+                    when ODIN_DEBUG { fmt.println("A pressed!") }
+                    if gpState.resquableIndex[0] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX]) }
+                } else if rl.IsKeyDown(KEY_S) || (rl.IsMouseButtonDown(MOUSE_L) && 
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX+1])) {
+                    when ODIN_DEBUG { fmt.println("S pressed!") }
+                    if gpState.resquableIndex[1] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX+1]) }
+                } else if rl.IsKeyDown(KEY_D) || (rl.IsMouseButtonDown(MOUSE_L) && 
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX+2])) {
+                    when ODIN_DEBUG { fmt.println("D pressed!") }
+                    if gpState.resquableIndex[2] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX+2]) }
+                } else if rl.IsKeyDown(KEY_F) || (rl.IsMouseButtonDown(MOUSE_L) && 
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX+3])) {
+                    when ODIN_DEBUG { fmt.println("F pressed!") }
+                    if gpState.resquableIndex[3] != 0 { processKeyDown(board[FRONT_ROW_BASEINDEX+3]) }
 
-				// KeyRelease event
+                // KeyRelease event
                 } else if rl.IsKeyReleased(KEY_A) || (rl.IsMouseButtonReleased(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX])) {
-					when ODIN_DEBUG { fmt.println("A released!") }
-					if gpState.resquableIndex[0] != 0 {
-						resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX, gpState.numAnimalLeft)
-						gpState.numAnimalLeft -= 1
-						gpState.resquedChanged = true
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX])) {
+                    when ODIN_DEBUG { fmt.println("A released!") }
+                    if gpState.resquableIndex[0] != 0 {
+                        resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX, gpState.numAnimalLeft)
+                        gpState.numAnimalLeft -= 1
+                        gpState.resquedChanged = true
                         msg = {}
-					}
-				} else if rl.IsKeyReleased(KEY_S) || (rl.IsMouseButtonReleased(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 1])) {
-					when ODIN_DEBUG { fmt.println("S released!") }
-					if gpState.resquableIndex[1] != 0 {
-						resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 1, gpState.numAnimalLeft)
-						gpState.numAnimalLeft -= 1
-						gpState.resquedChanged = true
+                    }
+                } else if rl.IsKeyReleased(KEY_S) || (rl.IsMouseButtonReleased(MOUSE_L) && 
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 1])) {
+                    when ODIN_DEBUG { fmt.println("S released!") }
+                    if gpState.resquableIndex[1] != 0 {
+                        resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 1, gpState.numAnimalLeft)
+                        gpState.numAnimalLeft -= 1
+                        gpState.resquedChanged = true
                         msg = {}
-					}
-				} else if rl.IsKeyReleased(KEY_D) || (rl.IsMouseButtonReleased(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 2])) {
+                    }
+                } else if rl.IsKeyReleased(KEY_D) || (rl.IsMouseButtonReleased(MOUSE_L) && 
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 2])) {
 					when ODIN_DEBUG { fmt.println("D released!") }
 					if gpState.resquableIndex[2] != 0 {
-						resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 2, gpState.numAnimalLeft)
-						gpState.numAnimalLeft -= 1
-						gpState.resquedChanged = true
+                        resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 2, gpState.numAnimalLeft)
+                        gpState.numAnimalLeft -= 1
+                        gpState.resquedChanged = true
                         msg = {}
-					}
-				} else if rl.IsKeyReleased(KEY_F) || (rl.IsMouseButtonReleased(MOUSE_L) && 
-						  isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 3])) {
-					when ODIN_DEBUG { fmt.println("F released!") }
-					if gpState.resquableIndex[3] != 0 {
-						resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 3, gpState.numAnimalLeft)
-						gpState.numAnimalLeft -= 1
-						gpState.resquedChanged = true
+                    }
+                } else if rl.IsKeyReleased(KEY_F) || (rl.IsMouseButtonReleased(MOUSE_L) && 
+                          isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 3])) {
+                    when ODIN_DEBUG { fmt.println("F released!") }
+                    if gpState.resquableIndex[3] != 0 {
+                        resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 3, gpState.numAnimalLeft)
+                        gpState.numAnimalLeft -= 1
+                        gpState.resquedChanged = true
                         msg = {}
-					}
-				}
-			}
+                    }
+                }
+            }
 
-			// gameclear mode
-		    case GameMode.GAME_CLEAR:
+            // gameclear mode
+            case GameMode.GAME_CLEAR:
 
-			if msg.gameMode != gameMode { setMsg(gameMode, 0) }
+            if msg.gameMode != gameMode { setMsg(gameMode, 0) }
 			
-			if isAllAnimUpdated {
-				if !willReplay {
-					if gameClearFrame < BOARD_SIZE {
-						anim := resqued[gameClearFrame]
-						jumpAnimal(anim, anim.pos, 18, 10)
-					}
-					gameClearFrame += 1
-					if gameClearFrame >= BOARD_SIZE { gameClearFrame = 0 }
-				} else {
-					resetAnimalsAndBoard(&animals, &board, &resqued, &frontRowPos)
-				    time.sleep(time.Millisecond * 500)
-					gameMode = GameMode.OPENING
-					msg = {}
-					willReplay = false
+            if isAllAnimUpdated {
+                if !willReplay {
+                    if gameClearFrame < BOARD_SIZE {
+                        anim := resqued[gameClearFrame]
+                        jumpAnimal(anim, anim.pos, 18, 10)
+                    }
+                    gameClearFrame += 1
+                    if gameClearFrame >= BOARD_SIZE { gameClearFrame = 0 }
+                } else {
+                    resetAnimalsAndBoard(&animals, &board, &resqued, &frontRowPos)
+                    time.sleep(time.Millisecond * 500)
+                    gameMode = GameMode.OPENING
+                    msg = {}
+                    willReplay = false
                     resetGamePlayState(&board, &gpState)
                 }
-			}
+            }
 				
-			if !willReplay && rl.IsKeyReleased(KEY_G) || (rl.IsMouseButtonReleased(MOUSE_L) && 
-			    isAnimRectClicked(resqued[BOARD_SIZE - 1 - gpState.numAnimalLeft])) {
-				when ODIN_DEBUG { fmt.println("G released on GAME_Clear! Play Again!") }
+            if !willReplay && rl.IsKeyReleased(KEY_G) || (rl.IsMouseButtonReleased(MOUSE_L) && 
+                isAnimRectClicked(resqued[BOARD_SIZE - 1 - gpState.numAnimalLeft])) {
+                when ODIN_DEBUG { fmt.println("G released on GAME_Clear! Play Again!") }
                 rl.PlaySound(sounds.Start)
-				for anim in resqued {
-					jumpAnimal(anim, Vec2{anim.x, -ANIM_SIZE} , 24, 20)
-				}
-				willReplay = true
-			}
+                for anim in resqued { jumpAnimal(anim, Vec2{anim.x, -ANIM_SIZE} , 24, 20) }
+                willReplay = true
+            }
 
-			// gamover mode
-		    case GameMode.GAME_OVER:
+            // gamover mode
+            case GameMode.GAME_OVER:
 			
-			if msg.gameMode != gameMode { setMsg(gameMode, 0) }
+            if msg.gameMode != gameMode { setMsg(gameMode, 0) }
 
-			if isAllAnimUpdated {
-				if !willReplay {
-					for i := 0; i < BOARD_SIZE; i += 1 {
-						if board[i] != nil && board[i].height >= MIN_ANIM_HEIGHT*5 { 
-							board[i].height -= 1 
-						}
-					}
-				} else {
-					resetAnimalsAndBoard(&animals, &board, &resqued, &frontRowPos)
-				    time.sleep(time.Millisecond * 500)
-					gameMode = GameMode.OPENING
-					willReplay = false
-					msg = {}
+            if isAllAnimUpdated {
+                if !willReplay {
+                    for i := 0; i < BOARD_SIZE; i += 1 {
+                        if board[i] != nil && board[i].height >= MIN_ANIM_HEIGHT*5 { 
+                            board[i].height -= 1 
+                        }
+                    }
+                } else {
+                    resetAnimalsAndBoard(&animals, &board, &resqued, &frontRowPos)
+                    time.sleep(time.Millisecond * 500)
+                    gameMode = GameMode.OPENING
+                    willReplay = false
+                    msg = {}
                     resetGamePlayState(&board, &gpState)
                 }
             }
 
             if !willReplay && rl.IsKeyReleased(KEY_G) || (rl.IsMouseButtonReleased(MOUSE_L) && 
-                isAnimRectClicked(resqued[BOARD_SIZE - 1 - gpState.numAnimalLeft])) {
+               isAnimRectClicked(resqued[BOARD_SIZE - 1 - gpState.numAnimalLeft])) {
                 when ODIN_DEBUG { fmt.println("G released on GAME_OVER! Play Again!") }
                 rl.PlaySound(sounds.Start)
                 for anim in board {
@@ -1018,70 +1010,70 @@ main :: proc() {
                 willReplay = true
             }
 
-		} //end switch(GameMode)
+        } //end switch(GameMode)
 
-		isAllAnimUpdated = updateAnimState(&animals, &board, &resqued, &frontRowPos, &gpState)
+        isAllAnimUpdated = updateAnimState(&animals, &board, &resqued, &frontRowPos, &gpState)
 
         // render
         rl.BeginDrawing()
         {
-			rl.DrawTextureEx(textures.GroundTexture, Vec2{0, 0}, 0, 1, rl.RAYWHITE)
+            rl.DrawTextureEx(textures.GroundTexture, Vec2{0, 0}, 0, 1, rl.RAYWHITE)
 			
-			if gameMode == GameMode.TITLE {
-				drawTitle(&title)
-				for anim in titleAnims { drawAnimal(anim) }
-			} else {
+            if gameMode == GameMode.TITLE {
+                drawTitle(&title)
+                for anim in titleAnims { drawAnimal(anim) }
+            } else {
                 i: u8
-				for i = 0; i < BOARD_SIZE; i += 1 {
-					if board[i] != nil { drawAnimal(board[i]) }
-				}
-				for i = 0; i < BOARD_SIZE - gpState.numAnimalLeft; i += 1 {
-					if resqued[i] != nil { drawAnimal(resqued[i]) }
-				}
-			}
+                for i = 0; i < BOARD_SIZE; i += 1 {
+                    if board[i] != nil { drawAnimal(board[i]) }
+                }
+                for i = 0; i < BOARD_SIZE - gpState.numAnimalLeft; i += 1 {
+                    if resqued[i] != nil { drawAnimal(resqued[i]) }
+                }
+            }
 
-			// draw message
-			if gameMode == msg.gameMode {
-				fontColor := rl.GOLD
-				if msg.duration == INDEFINITE {
-					if msg.frames < FPS*3 {
-						alpha := (msg.frames*2 % 255*2) 
-						if alpha > 255 { alpha = 255*2 - alpha }
-						msg.alpha = u8(alpha)
-					} else if msg.alpha <= 253 {
-						msg.alpha += 2
-					}
-				} else {
-					if msg.frames <= msg.duration {
-						alpha := (msg.frames*2 % 255*2) 
-						if alpha > 255 { alpha = 255*2 - alpha }
-						msg.alpha = u8(alpha)
-					} else {
-						if msg.alpha <= 1 {
-							msg.alpha = 0
-						} else {
-							msg.alpha -= 2
-						}
-					}
-				}
+            // draw message
+            if gameMode == msg.gameMode {
+                fontColor := rl.GOLD
+                if msg.duration == INDEFINITE {
+                    if msg.frames < FPS*3 {
+                        alpha := (msg.frames*2 % 255*2) 
+                        if alpha > 255 { alpha = 255*2 - alpha }
+                        msg.alpha = u8(alpha)
+                    } else if msg.alpha <= 253 {
+                        msg.alpha += 2
+                    }
+                } else {
+                    if msg.frames <= msg.duration {
+                        alpha := (msg.frames*2 % 255*2) 
+                        if alpha > 255 { alpha = 255*2 - alpha }
+                        msg.alpha = u8(alpha)
+                    } else {
+                        if msg.alpha <= 1 {
+                            msg.alpha = 0
+                        } else {
+                            msg.alpha -= 2
+                        }
+                    }
+                }
 
-				fontColor.a = u8(msg.alpha)
+                fontColor.a = u8(msg.alpha)
                 l1PosX := i32((1 - (f32(len(msg.l1))/MAX_MSG_LEN))*WINDOW_WIDTH/2)
                 l2PosX := i32((1 - (f32(len(msg.l2))/MAX_MSG_LEN))*WINDOW_WIDTH/2)
-				if msg.l2 == "" {
-					rl.DrawText(cstring(raw_data(msg.l1)), MARGIN_WIDTH + l1PosX, MSG_POS_Y,
+                if msg.l2 == "" {
+                    rl.DrawText(cstring(raw_data(msg.l1)), MARGIN_WIDTH + l1PosX, MSG_POS_Y,
                                 DEFAULT_FONT_SIZE, fontColor)
-				} else {
-					rl.DrawText(cstring(raw_data(msg.l1)), MARGIN_WIDTH + l1PosX, 
+                } else {
+                    rl.DrawText(cstring(raw_data(msg.l1)), MARGIN_WIDTH + l1PosX, 
                                 MSG_POS_Y - DEFAULT_FONT_SIZE*0.5, DEFAULT_FONT_SIZE, fontColor)
-					rl.DrawText(cstring(raw_data(msg.l2)), MARGIN_WIDTH + l2PosX, 
+                    rl.DrawText(cstring(raw_data(msg.l2)), MARGIN_WIDTH + l2PosX, 
                                 MSG_POS_Y + DEFAULT_FONT_SIZE*0.5, DEFAULT_FONT_SIZE, fontColor)
                 }
-			}
+            }
         }
         rl.EndDrawing()
     }
 
-	unloadSounds()
+    unloadSounds()
 }
 
