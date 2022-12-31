@@ -827,8 +827,11 @@ main :: proc() {
             if frameDiv < BOARD_SIZE {
                 anim := &animals[frameDiv]
                 if frameMod == 0 {
+                    // titleAnims[0] is crossed the bridge after opening. So it has to jump "up".
+                    // So, ascending frames should be greater than the half of total jump frames
                     if anim == titleAnims[0] {
                         jumpAnimal(anim, anim.dest, 24, 16)
+                    // all the other animals jump ""down"" to their gameplay positions.
                     } else {
                         jumpAnimal(anim, anim.dest, 20, 4)
                     }
@@ -925,8 +928,8 @@ main :: proc() {
                     }
                 } else if rl.IsKeyReleased(KEY_D) || (rl.IsMouseButtonReleased(MOUSE_L) && 
                           isAnimRectClicked(board[FRONT_ROW_BASEINDEX + 2])) {
-					when ODIN_DEBUG { fmt.println("D released!") }
-					if gpState.resquableIndex[2] != 0 {
+                    when ODIN_DEBUG { fmt.println("D released!") }
+                    if gpState.resquableIndex[2] != 0 {
                         resqueAt(&board, &resqued, FRONT_ROW_BASEINDEX + 2, gpState.numAnimalLeft)
                         gpState.numAnimalLeft -= 1
                         gpState.resquedChanged = true
@@ -975,7 +978,7 @@ main :: proc() {
                 willReplay = true
             }
 
-            // gamover mode
+            // gameover mode
             case GameMode.GAME_OVER:
 			
             if msg.gameMode != gameMode { setMsg(gameMode, 0) }
